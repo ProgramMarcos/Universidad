@@ -1,0 +1,74 @@
+
+LIBRARY ieee;                                               
+USE ieee.std_logic_1164.all;                                
+
+ENTITY me_mp_vhd_tst IS
+END me_mp_vhd_tst;
+ARCHITECTURE me_mp_arch OF me_mp_vhd_tst IS
+-- constants                                                 
+-- signals                                                   
+SIGNAL ESTADO : STD_LOGIC_VECTOR(2 DOWNTO 0);
+SIGNAL pulsador : STD_LOGIC;
+SIGNAL reloj : STD_LOGIC;
+SIGNAL reset : STD_LOGIC;
+SIGNAL salida : STD_LOGIC;
+SIGNAL segmentos : STD_LOGIC_VECTOR(6 DOWNTO 0);
+COMPONENT me_mp
+	PORT (
+	ESTADO : BUFFER STD_LOGIC_VECTOR(2 DOWNTO 0);
+	pulsador : IN STD_LOGIC;
+	reloj : IN STD_LOGIC;
+	reset : IN STD_LOGIC;
+	salida : BUFFER STD_LOGIC;
+	segmentos : BUFFER STD_LOGIC_VECTOR(6 DOWNTO 0)
+	);
+END COMPONENT;
+BEGIN
+	i1 : me_mp
+	PORT MAP (
+-- list connections between master ports and signals
+	ESTADO => ESTADO,
+	pulsador => pulsador,
+	reloj => reloj,
+	reset => reset,
+	salida => salida,
+	segmentos => segmentos
+	);
+
+PROCESS                                                                                    
+  BEGIN                                                        
+    reset<='1';wait for 25 ns;
+    reset<='0';                     
+WAIT;                                                       
+END PROCESS;
+                                          
+PROCESS                                                                                   
+  BEGIN
+      reloj<='0';
+      for i in 0 to 50 loop
+        reloj<='1'; wait for 10 ns;
+        reloj<='0'; wait for 10 ns;
+      end loop;
+  WAIT;                                                        
+END PROCESS;  
+
+PROCESS                                                                                   
+  BEGIN
+    --el pulsador se activa a nivel bajo
+      pulsador<='0'; wait for 190 ns;--hace una vuelta del e0 hasta el e7 y vuelve al e0
+      pulsador<='1'; wait for 55 ns;--salta del e0 al e4, del e4 al e5 
+                                    --y entra en un bucle de salto entre e4 y e5
+      pulsador<='0'; wait for 100 ns;-- lo dejo evolucionar e4-e5-e6-e7-e0-e1-e2 y salta al e6
+      pulsador<='1'; wait for 20 ns;--se queda en e1
+      pulsador<='0'; wait for 15 ns;
+      pulsador<='1'; wait for 20 ns;
+      pulsador<='0'; wait for 100 ns;
+      pulsador<='1'; wait for 40 ns; --se queda en e3
+      pulsador<='0'; wait for 60 ns;
+      pulsador<='1'; wait for 55 ns;--se queda en e6
+      pulsador<='0'; wait for 20 ns;--lo hago pasasr a e7
+      pulsador<='1'; wait for 55 ns;--se queda en e7
+           
+WAIT; --simular unos 700 ns                                                        
+END PROCESS;                                         
+END me_mp_arch;

@@ -1,0 +1,56 @@
+
+LIBRARY ieee;                                               
+USE ieee.std_logic_1164.all;                                
+
+ENTITY spi_adc_vhd_tst IS
+END spi_adc_vhd_tst;
+ARCHITECTURE spi_adc_arch OF spi_adc_vhd_tst IS
+-- constants                                                 
+-- signals                                                   
+SIGNAL clk : STD_LOGIC;
+SIGNAL cs : STD_LOGIC;
+SIGNAL dout : STD_LOGIC_VECTOR(9 DOWNTO 0);
+SIGNAL reset : STD_LOGIC;
+SIGNAL sc : STD_LOGIC;
+SIGNAL sck : STD_LOGIC;
+SIGNAL sdi : STD_LOGIC;
+COMPONENT spi_adc
+	PORT (
+	clk : IN STD_LOGIC;
+	cs : OUT STD_LOGIC;
+	dout : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+	reset : IN STD_LOGIC;
+	sc : IN STD_LOGIC;
+	sck : OUT STD_LOGIC;
+	sdi : IN STD_LOGIC
+	);
+END COMPONENT;
+BEGIN
+	i1 : spi_adc
+	PORT MAP (
+-- list connections between master ports and signals
+	clk => clk,
+	cs => cs,
+	dout => dout,
+	reset => reset,
+	sc => sc,
+	sck => sck,
+	sdi => sdi
+	);
+reset<='1','0' after 1000 ns;
+sc<='1','0' after 3000 ns;
+dato : PROCESS                                          
+BEGIN                                                        
+sdi<='0'; wait for 6500 ns;
+sdi<='1'; wait for 1000 ns;  
+sdi<='0'; wait for 1000 ns;  
+sdi<='1'; wait for 2000 ns;  
+sdi<='0'; wait for 2000 ns;  
+sdi<='1'; wait for 7500 ns;                                                                          
+END PROCESS dato;                                           
+reloj : PROCESS                                             
+BEGIN                                                         
+clk<='0'; wait for 10 ns;
+clk<='1'; wait for 10 ns;                                                      
+END PROCESS reloj;                                          
+END spi_adc_arch;
